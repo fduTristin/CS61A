@@ -28,9 +28,13 @@ def roll_dice(num_rolls, dice=six_sided):
         if point == 1:
             points = 1
             break
+        # end the loop if pig_out happens
         else:
             points += point
-        return points
+    # roll the dice for the rest times after pig_out happens
+    for j in range(num_rolls - i - 1):
+        dice()
+    return points
     # END PROBLEM 1
 
 
@@ -42,6 +46,8 @@ def free_bacon(score):
     assert score < 100, "The game should be over."
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    fbscore = score // 10 + 10 - (score % 10)
+    return fbscore
     # END PROBLEM 2
 
 
@@ -60,6 +66,10 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
     assert opponent_score < 100, "The game should be over."
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    if num_rolls == 0:
+        return free_bacon(opponent_score)
+    else:
+        return roll_dice(num_rolls, dice)
     # END PROBLEM 3
 
 
@@ -69,6 +79,8 @@ def is_swap(player_score, opponent_score):
     """
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    diff = abs((player_score % 10) - (opponent_score % 10))
+    return diff == (opponent_score % 100) // 10
     # END PROBLEM 4
 
 
@@ -117,6 +129,30 @@ def play(
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    point0 = 0
+    point1 = 0
+    while score0 < goal and score1 < goal:
+        if who == 0:
+            num = strategy0(score0, score1)
+            if abs(num - point0) == 2 and feral_hogs:
+                score0 += 3
+            point0 = take_turn(num, score1, dice)
+            score0 += point0
+            if is_swap(score0, score1):
+                temp = score0
+                score0 = score1
+                score1 = temp
+        else:
+            num = strategy1(score1, score0)
+            if abs(num - point1) == 2 and feral_hogs:
+                score1 += 3
+            point1 = take_turn(num, score0, dice)
+            score1 += point1
+            if is_swap(score1, score0):
+                temp = score0
+                score0 = score1
+                score1 = temp
+        who = other(who)
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
     # BEGIN PROBLEM 6
