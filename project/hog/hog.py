@@ -142,6 +142,7 @@ def play(
                 temp = score0
                 score0 = score1
                 score1 = temp
+
         else:
             num = strategy1(score1, score0)
             if abs(num - point1) == 2 and feral_hogs:
@@ -153,11 +154,12 @@ def play(
                 score0 = score1
                 score1 = temp
         who = other(who)
-    # END PROBLEM 5
-    # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
-    # BEGIN PROBLEM 6
-    "*** YOUR CODE HERE ***"
-    # END PROBLEM 6
+        # END PROBLEM 5
+        # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
+        # BEGIN PROBLEM 6
+        "*** YOUR CODE HERE ***"
+        say = say(score0, score1)
+        # END PROBLEM 6
     return score0, score1
 
 
@@ -249,6 +251,30 @@ def announce_highest(who, last_score=0, running_high=0):
     assert who == 0 or who == 1, "The who argument should indicate a player."
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+
+    def f(s0, s1):
+        r_h = running_high
+        if who == 0:
+            if s0 - last_score > running_high:
+                r_h = s0 - last_score
+                print(
+                    r_h,
+                    "point(s)! That's the biggest gain yet for Player",
+                    who,
+                )
+            last = s0
+        else:
+            if s1 - last_score > running_high:
+                r_h = s1 - last_score
+                print(
+                    r_h,
+                    "point(s)! That's the biggest gain yet for Player",
+                    who,
+                )
+            last = s1
+        return announce_highest(who, last, r_h)
+
+    return f
     # END PROBLEM 7
 
 
