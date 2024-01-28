@@ -1,4 +1,3 @@
-
 def lambda_curry2(func):
     """
     Returns a Curried version of a two-argument function FUNC.
@@ -15,8 +14,14 @@ def lambda_curry2(func):
     3
     """
     "*** YOUR CODE HERE ***"
-    return ______
 
+    def f(x):
+        def g(y):
+            return func(x, y)
+
+        return g
+
+    return f
 
 
 def count_cond(condition):
@@ -48,6 +53,16 @@ def count_cond(condition):
     """
     "*** YOUR CODE HERE ***"
 
+    def func(n):
+        i = 1
+        cnt = 0
+        while i <= n:
+            if condition(n, i):
+                cnt += 1
+            i += 1
+        return cnt
+
+    return func
 
 
 def both_paths(sofar="S"):
@@ -62,7 +77,15 @@ def both_paths(sofar="S"):
     SUU
     """
     "*** YOUR CODE HERE ***"
+    print(sofar)
 
+    def func1(sf1=sofar + "U"):
+        return both_paths(sf1)
+
+    def func2(sf2=sofar + "D"):
+        return both_paths(sf2)
+
+    return func1, func2
 
 
 def compose1(f, g):
@@ -82,6 +105,7 @@ def compose1(f, g):
     """
     return lambda x: f(g(x))
 
+
 def composite_identity(f, g):
     """
     Return a function with one parameter x that returns True if f(g(x)) is
@@ -97,7 +121,7 @@ def composite_identity(f, g):
     False
     """
     "*** YOUR CODE HERE ***"
-
+    return lambda x: f(g(x)) == g(f(x))
 
 
 def cycle(f1, f2, f3):
@@ -128,3 +152,17 @@ def cycle(f1, f2, f3):
     """
     "*** YOUR CODE HERE ***"
 
+    def func(n):
+        def f(x):
+            i = 0
+            while i < n:
+                if i % 3 == 0:
+                    x = f1(x)
+                elif i % 3 == 1:
+                    x = f2(x)
+                else:
+                    x = f3(x)
+                i+=1
+            return x
+        return f
+    return func
