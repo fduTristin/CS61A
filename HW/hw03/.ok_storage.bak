@@ -3,3 +3,4 @@
 'g_iter-correct', (1024, 66)
 'missing_digits-correct', (1536, 66)
 'count_change-correct', (2048, 66)
+'move_stack-correct', (2560, 66)
