@@ -6,7 +6,7 @@ def coords(fn, seq, lower, upper):
     [[-2, 4], [1, 1], [3, 9]]
     """
     "*** YOUR CODE HERE ***"
-    return ______
+    return [[item, fn(item)] for item in seq if lower <= fn(item) <= upper]
 
 
 def riffle(deck):
@@ -19,11 +19,14 @@ def riffle(deck):
     [0, 10, 1, 11, 2, 12, 3, 13, 4, 14, 5, 15, 6, 16, 7, 17, 8, 18, 9, 19]
     """
     "*** YOUR CODE HERE ***"
-    return _______
+    return [
+        deck[i // 2 if i % 2 == 0 else i // 2 + len(deck) // 2]
+        for i in range(len(deck))
+    ]
 
 
 def berry_finder(t):
-    """Returns True if t contains a node with the value 'berry' and 
+    """Returns True if t contains a node with the value 'berry' and
     False otherwise.
 
     >>> scrat = tree('berry')
@@ -40,6 +43,12 @@ def berry_finder(t):
     True
     """
     "*** YOUR CODE HERE ***"
+    if is_leaf(t):
+        return label(t) == "berry"
+    else:
+        return label(t) == "berry" or any(
+            [berry_finder(branch) for branch in branches(t)]
+        )
 
 
 def sprout_leaves(t, leaves):
@@ -76,6 +85,12 @@ def sprout_leaves(t, leaves):
           2
     """
     "*** YOUR CODE HERE ***"
+    if is_leaf(t):
+        t = tree(label(t), [tree(leaf) for leaf in leaves])
+    else:
+        t = tree(label(t), [sprout_leaves(branch, leaves) for branch in branches(t)])
+    return t
+
 
 # Abstraction tests for sprout_leaves and berry_finder
 def check_abstraction():
@@ -162,6 +177,20 @@ def add_trees(t1, t2):
       5
     """
     "*** YOUR CODE HERE ***"
+    len1 = len(branches(t1))
+    len2 = len(branches(t2))
+    length = max(len1, len2)
+    t3 = tree(
+        label(t1) + label(t2),
+        [
+            add_trees(
+                branches(t1)[i] if i < len1 else [0],
+                branches(t2)[i] if i < len2 else [0],
+            )
+            for i in range(length)
+        ],
+    )
+    return t3
 
 
 def build_successors_table(tokens):
@@ -179,13 +208,15 @@ def build_successors_table(tokens):
     ['We']
     """
     table = {}
-    prev = '.'
+    prev = "."
     for word in tokens:
         if prev not in table:
-            "*** YOUR CODE HERE ***"
-        "*** YOUR CODE HERE ***"
+            table[prev] = [word]
+        else:
+            table[prev] += [word]
         prev = word
     return table
+
 
 def construct_sent(word, table):
     """Prints a random sentence starting with word, sampling from
@@ -198,57 +229,70 @@ def construct_sent(word, table):
     'Sentences are cool.'
     """
     import random
-    result = ''
-    while word not in ['.', '!', '?']:
+
+    result = ""
+    while word not in [".", "!", "?"]:
         "*** YOUR CODE HERE ***"
+        result += " " + word
+        word = random.choice(table[word])
     return result.strip() + word
 
-def shakespeare_tokens(path='shakespeare.txt', url='http://composingprograms.com/shakespeare.txt'):
+
+def shakespeare_tokens(
+    path="shakespeare.txt", url="http://composingprograms.com/shakespeare.txt"
+):
     """Return the words of Shakespeare's plays as a list."""
     import os
     from urllib.request import urlopen
+
     if os.path.exists(path):
-        return open('shakespeare.txt', encoding='ascii').read().split()
+        return open("shakespeare.txt", encoding="ascii").read().split()
     else:
         shakespeare = urlopen(url)
-        return shakespeare.read().decode(encoding='ascii').split()
+        return shakespeare.read().decode(encoding="ascii").split()
+
 
 # Uncomment the following two lines
-# tokens = shakespeare_tokens()
-# table = build_successors_table(tokens)
+tokens = shakespeare_tokens()
+table = build_successors_table(tokens)
+
 
 def random_sent():
     import random
-    return construct_sent(random.choice(table['.']), table)
 
+    return construct_sent(random.choice(table["."]), table)
 
 
 # Tree ADT
+
 
 def tree(label, branches=[]):
     """Construct a tree with the given label value and a list of branches."""
     if change_abstraction.changed:
         for branch in branches:
-            assert is_tree(branch), 'branches must be trees'
-        return {'label': label, 'branches': list(branches)}
+            assert is_tree(branch), "branches must be trees"
+        return {"label": label, "branches": list(branches)}
     else:
         for branch in branches:
-            assert is_tree(branch), 'branches must be trees'
+            assert is_tree(branch), "branches must be trees"
         return [label] + list(branches)
+
 
 def label(tree):
     """Return the label value of a tree."""
     if change_abstraction.changed:
-        return tree['label']
+        return tree["label"]
     else:
         return tree[0]
+
 
 def branches(tree):
     """Return the list of branches of the given tree."""
     if change_abstraction.changed:
-        return tree['branches']
+        return tree["branches"]
     else:
         return tree[1:]
+
 
 def is_tree(tree):
     """Returns True if the given tree is a tree, and False otherwise."""
@@ -267,14 +311,17 @@ def is_tree(tree):
                 return False
         return True
 
+
 def is_leaf(tree):
     """Returns True if the given tree's list of branches is empty, and False
     otherwise.
     """
     return not branches(tree)
 
+
 def change_abstraction(change):
     change_abstraction.changed = change
+
 
 change_abstraction.changed = False
 
@@ -298,9 +345,10 @@ def print_tree(t, indent=0):
       6
         7
     """
-    print('  ' * indent + str(label(t)))
+    print("  " * indent + str(label(t)))
     for b in branches(t):
         print_tree(b, indent + 1)
+
 
 def copy_tree(t):
     """Returns a copy of t. Only for testing purposes.
@@ -312,4 +360,3 @@ def copy_tree(t):
     5
     """
     return tree(label(t), [copy_tree(b) for b in branches(t)])
-
